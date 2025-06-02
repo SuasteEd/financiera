@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (success != null) {
      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen(user: success)),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
       // Redirigir a otra pantalla
     } else {

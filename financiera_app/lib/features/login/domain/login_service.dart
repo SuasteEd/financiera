@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:financiera_app/core/utils/shared_prefs.dart';
 import 'package:financiera_app/features/login/domain/user_model.dart';
 
 class AuthService {
@@ -7,15 +8,17 @@ class AuthService {
 
   Future<UserModel?> login(String email, String password) async {
     try {
+      final prefs = Sharedprefs();
       final response = await _dio.post(
         '/login',
         data: {'email': email, 'password': password},
       );
 
-      // final user = response.data['user'];
-      final token = response.data['token'];
-
       if (response.statusCode == 200) {
+        // final user = response.data['user'];
+        final token = response.data['token'];
+        prefs.token = token;
+        print('Token guardado: $token');
         final user = UserModel.fromJson(response.data['user']);
         print('Usuario: ${user}');
         return user;

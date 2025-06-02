@@ -1,126 +1,80 @@
-import 'package:financiera_app/features/login/domain/user_model.dart';
+import 'package:financiera_app/features/home/domain/home_service.dart';
+import 'package:financiera_app/features/home/domain/models/response/client_response.dart';
+import 'package:financiera_app/features/home/presentation/add_client.dart';
 import 'package:flutter/material.dart';
 
-
-class Cliente {
-  final String nombre;
-  final String telefono;
-  final String direccion;
-  bool archivado;
-  bool tieneDocumentos;
-
-  Cliente({
-    required this.nombre,
-    required this.telefono,
-    required this.direccion,
-    this.archivado = false,
-    this.tieneDocumentos = false,
-  });
-}
-
 class HomeScreen extends StatefulWidget {
-  final UserModel? user;
-  const HomeScreen({ Key? key, this.user }) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  HomeScreenState createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  List<Cliente> clientes = [
-    Cliente(
-        nombre: 'Juan Pérez',
-        telefono: '555-123-4567',
-        direccion: 'Av. Reforma 123',
-        tieneDocumentos: true),
-    Cliente(
-        nombre: 'María López',
-        telefono: '555-987-6543',
-        direccion: 'Calle Hidalgo 321'),
-  ];
-
-  void _agregarCliente() {
-    setState(() {
-      clientes.add(
-        Cliente(
-          nombre: 'Nuevo Cliente',
-          telefono: '555-000-0000',
-          direccion: 'Dirección genérica',
-        ),
-      );
-    });
+class HomeScreenState extends State<HomeScreen> {
+  bool isLoading = false;
+  List<ClientResponse> clients = [];
+  @override
+  void initState() {
+    super.initState();
+    init();
   }
 
-  void _editarCliente(int index) {
-    setState(() {
-      clientes[index] = Cliente(
-        nombre: '${clientes[index].nombre} (Editado)',
-        telefono: clientes[index].telefono,
-        direccion: clientes[index].direccion,
-        tieneDocumentos: clientes[index].tieneDocumentos,
-      );
-    });
-  }
-
-  void _eliminarCliente(int index) {
-    if (!clientes[index].tieneDocumentos) {
-      setState(() {
-        clientes.removeAt(index);
-      });
+  void init() async {
+    setState(() => isLoading = true);
+    clients = (await HomeService().getClients()) ?? [];
+    setState(() => isLoading = false);
+    if (clients.isNotEmpty) {
+      // Aquí puedes manejar la lista de clientes obtenida
+      print('Clientes obtenidos: ${clients.length}');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se puede eliminar: tiene documentos')),
-      );
+      print('Error al obtener los clientes');
     }
-  }
-
-  void _archivarCliente(int index) {
+    await HomeService().getClients();
     setState(() {
-      clientes[index].archivado = true;
+      isLoading = false;
     });
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Gestión de Clientes')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _agregarCliente,
-        child: const Icon(Icons.add),
-      ),
-      body: ListView.builder(
-        itemCount: clientes.length,
-        itemBuilder: (context, index) {
-          final cliente = clientes[index];
-          return Card(
-            child: ListTile(
-              title: Text(cliente.nombre),
-              subtitle: Text(
-                  'Tel: ${cliente.telefono}\nDir: ${cliente.direccion}'),
-              trailing: PopupMenuButton<String>(
-                onSelected: (value) {
-                  switch (value) {
-                    case 'Editar':
-                      _editarCliente(index);
-                      break;
-                    case 'Eliminar':
-                      _eliminarCliente(index);
-                      break;
-                    case 'Archivar':
-                      _archivarCliente(index);
-                      break;
-                  }
-                },
-                itemBuilder: (_) => [
-                  const PopupMenuItem(value: 'Editar', child: Text('Editar')),
-                  const PopupMenuItem(value: 'Eliminar', child: Text('Eliminar')),
-                  const PopupMenuItem(value: 'Archivar', child: Text('Archivar')),
-                ],
+      appBar: AppBar(title: const Text('Clientes')),
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: clients.length,
+                        itemBuilder: (context, index) {
+                          final client = clients[index];
+                          return Card(
+                            child: ListTile(
+                              title: Text(client.name ?? ''),
+                              subtitle: Text(
+                                'CURP: ${client.curp ?? ''}\nEmail: ${client.email ?? ''}\nTeléfono: ${client.phone ?? ''}',
+                              ),
+                              trailing: Text('Estado: ${client.status ?? ''}'),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              tileColor: cliente.archivado ? Colors.grey[300] : null,
-            ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddClient()),
           );
         },
+        child: const Icon(Icons.add),
       ),
     );
   }
