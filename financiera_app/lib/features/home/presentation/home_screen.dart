@@ -42,28 +42,37 @@ class HomeScreenState extends State<HomeScreen> {
       body:
           isLoading
               ? const Center(child: CircularProgressIndicator())
-              : Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: clients.length,
-                        itemBuilder: (context, index) {
-                          final client = clients[index];
-                          return Card(
-                            child: ListTile(
-                              title: Text(client.name ?? ''),
-                              subtitle: Text(
-                                'CURP: ${client.curp ?? ''}\nEmail: ${client.email ?? ''}\nTeléfono: ${client.phone ?? ''}',
+              : RefreshIndicator(
+                onRefresh: () {
+                  init();
+                  return Future.value();
+                },
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          reverse: true,
+                          itemCount: clients.length,
+                          itemBuilder: (context, index) {
+                            final client = clients[index];
+                            return Card(
+                              child: ListTile(
+                                title: Text(client.name ?? ''),
+                                subtitle: Text(
+                                  'CURP: ${client.curp ?? ''}\nEmail: ${client.email ?? ''}\nTeléfono: ${client.phone ?? ''}',
+                                ),
+                                trailing: Text(
+                                  'Estado: ${client.status ?? ''}',
+                                ),
                               ),
-                              trailing: Text('Estado: ${client.status ?? ''}'),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 
