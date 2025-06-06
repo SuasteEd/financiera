@@ -25,10 +25,21 @@ class _SplashScreenState extends State<SplashScreen> {
 }
   @override
   Widget build(BuildContext context){
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       body: Center(
-        child: CircularProgressIndicator(),
-      )
+        child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image.network(
+              'https://cdn-icons-png.freepik.com/256/9321/9321926.png?semt=ais_hybrid',
+            ),
+            const SizedBox(height: 20),
+            CircularProgressIndicator(),
+          ],
+        ),
+      ),
     );
   }
 }

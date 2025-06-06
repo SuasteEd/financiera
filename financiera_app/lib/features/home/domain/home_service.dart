@@ -62,4 +62,32 @@ class HomeService {
       return false;
     }
   }
+
+
+  Future<bool> putClient(ClientResponse client) async {
+    try {
+      final prefs = Sharedprefs();
+      final token = prefs.token;
+      final response = await _dio.put(
+        '/clients/${client.id}',
+        data: client.toJson(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      }
+
+      return false;
+    } on DioException catch (e) {
+      print('Error al iniciar sesión: ${e.response?.data ?? e.message}');
+      return false;
+    }
+  }
 }
