@@ -1,11 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:financiera_app/core/utils/shared_prefs.dart';
 import 'package:financiera_app/features/home/domain/models/response/client_response.dart';
-import 'package:financiera_app/features/login/domain/user_model.dart';
 
 class HomeService {
   final Dio _dio = Dio(BaseOptions(baseUrl: 'http://64.23.214.143:8951/api'));
-  // final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   Future<List<ClientResponse>?> getClients() async {
     try {
@@ -63,13 +61,12 @@ class HomeService {
     }
   }
 
-
   Future<bool> putClient(ClientResponse client) async {
     try {
       final prefs = Sharedprefs();
       final token = prefs.token;
-      final response = await _dio.put(
-        '/clients/${client.id}',
+      final response = await _dio.post(
+        '/clients/edit/${client.id}',
         data: client.toJson(),
         options: Options(
           headers: {

@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:financiera_app/core/utils/shared_prefs.dart';
+import 'package:financiera_app/features/documents/domain/models/response/docs_charged.dart';
 import 'package:financiera_app/features/home/domain/models/response/client_response.dart';
 
 class DocService {
   final Dio _dio = Dio(BaseOptions(baseUrl: 'http://64.23.214.143:8951/api'));
 
   // Método para obtener documentos
-  Future<List<ClientResponse>?> getDocuments(int id) async {
+  Future<List<DocsCharged>?> getDocuments(int id) async {
     try {
       final prefs = Sharedprefs();
       final token = prefs.token;
@@ -24,13 +25,39 @@ class DocService {
       if (response.statusCode == 200) {
         final data = response.data as List;
         final clients =
-            data.map((client) => ClientResponse.fromJson(client)).toList();
+            data.map((client) => DocsCharged.fromJson(client)).toList();
         return clients;
       }
 
       return null;
     } on DioException catch (e) {
       print('Error al obtener documentos: ${e.response?.data ?? e.message}');
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getRequiredDocuments() async {
+    try {
+      final prefs = Sharedprefs();
+      final token = prefs.token;
+      final response = await _dio.get(
+        '/documents/required',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      }
+
+      return null;
+    } on DioException catch (e) {
+      print('Error al obtener documento por ID: ${e.response?.data ?? e.message}');
       return null;
     }
   }

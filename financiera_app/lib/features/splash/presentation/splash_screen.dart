@@ -32,8 +32,11 @@ class _SplashScreenState extends State<SplashScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.network(
-              'https://cdn-icons-png.freepik.com/256/9321/9321926.png?semt=ais_hybrid',
+            Hero(
+              tag: 'logo',
+              child: Image.network(
+                'https://cdn-icons-png.freepik.com/256/9321/9321926.png?semt=ais_hybrid',
+              ),
             ),
             const SizedBox(height: 20),
             CircularProgressIndicator(),

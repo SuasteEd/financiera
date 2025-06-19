@@ -12,6 +12,7 @@ class AddClient extends StatefulWidget {
   @override
   AddClientState createState() => AddClientState();
 }
+
 class AddClientState extends State<AddClient> {
   final _formKey = GlobalKey<FormState>();
   final Map<String, TextEditingController> controllers = {};
@@ -82,14 +83,29 @@ class AddClientState extends State<AddClient> {
     'marital_status', 'gender', 'marital_regime', 'occupation', 'spouse_name',
     'spouse_nationality', 'spouse_email', 'pep_position', 'pep_period',
     'related_pep_name', 'related_pep_position', 'credit_destination',
-    'resource_origin', 'payment_frequency', 'payment_type', 'status', 'monthly_income',
+    'resource_origin',
+    'payment_frequency',
+    'payment_type',
+    'status',
+    'monthly_income',
     'other_income', 'payment_count', 'payment_amount',
 
     // Datos del Aval
-    'aval_name', 'aval_phone', 'aval_email', 'aval_fiel_serial_number', 'aval_rfc',
-    'aval_curp', 'aval_street', 'aval_colony', 'aval_state', 'aval_municipality',
+    'aval_name',
+    'aval_phone',
+    'aval_email',
+    'aval_fiel_serial_number',
+    'aval_rfc',
+    'aval_curp',
+    'aval_street',
+    'aval_colony',
+    'aval_state',
+    'aval_municipality',
     'aval_nationality', 'aval_postal_code', 'aval_birthplace', 'aval_birthdate',
-    'aval_gender', 'aval_marital_status', 'aval_marital_regime', 'aval_occupation',
+    'aval_gender',
+    'aval_marital_status',
+    'aval_marital_regime',
+    'aval_occupation',
     'aval_spouse_name', 'aval_spouse_nationality', 'aval_spouse_email',
   ];
 
@@ -99,7 +115,9 @@ class AddClientState extends State<AddClient> {
   void initState() {
     super.initState();
     for (var field in fields) {
-      controllers[field] = TextEditingController(text: _getTextForController(field));
+      controllers[field] = TextEditingController(
+        text: _getTextForController(field),
+      );
     }
   }
 
@@ -108,7 +126,8 @@ class AddClientState extends State<AddClient> {
     if (value is double) {
       return value.toString(); // Convierte a String si es double
     }
-    return value?.toString() ?? ''; // De lo contrario, solo lo convierte a String
+    return value?.toString() ??
+        ''; // De lo contrario, solo lo convierte a String
   }
 
   @override
@@ -135,17 +154,20 @@ class AddClientState extends State<AddClient> {
       appBar: AppBar(
         title: Text(widget.client == null ? 'Crear Cliente' : 'Editar Cliente'),
         actions: [
-          if(widget.client != null)
-          IconButton(
-            icon: const Icon(Icons.document_scanner),
-            onPressed: () {
-             Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => DocumentUploadScreen()
-                ),
-              );
-            },
-          ),
+          if (widget.client != null)
+            IconButton(
+              icon: const Icon(Icons.document_scanner),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) => DocumentUploadScreen(
+                          clientId: widget.client!.id ?? 0,
+                        ),
+                  ),
+                );
+              },
+            ),
         ],
       ),
       body: Padding(
@@ -159,7 +181,9 @@ class AddClientState extends State<AddClient> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              ...fields.where((f) => !f.startsWith('aval_')).map((f) => buildTextField(_getLabel(f), f)),
+              ...fields
+                  .where((f) => !f.startsWith('aval_'))
+                  .map((f) => buildTextField(_getLabel(f), f)),
 
               const SizedBox(height: 20),
               const Text(
@@ -167,11 +191,16 @@ class AddClientState extends State<AddClient> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               // Llenar los campos del Aval también
-              ...fields.where((f) => f.startsWith('aval_')).map((f) => buildTextField(_getLabel(f), f)),
+              ...fields
+                  .where((f) => f.startsWith('aval_'))
+                  .map((f) => buildTextField(_getLabel(f), f)),
 
               const SizedBox(height: 20),
               CustomButtonWidget(
-                text: widget.client == null ? 'Guardar Cliente' : 'Actualizar Cliente',
+                text:
+                    widget.client == null
+                        ? 'Guardar Cliente'
+                        : 'Actualizar Cliente',
                 texTcolor: Colors.white,
                 isLoading: isLoading,
                 onPressed: () async {
@@ -179,65 +208,182 @@ class AddClientState extends State<AddClient> {
                     isLoading = true;
                   });
 
-                  final data = await HomeService().postClient(
-                    ClientResponse(
-                      name: controllers['name']?.text,
-                      phone: controllers['phone']?.text,
-                      email: controllers['email']?.text,
-                      rfc: controllers['rfc']?.text,
-                      curp: controllers['curp']?.text,
-                      street: controllers['street']?.text,
-                      colony: controllers['colony']?.text,
-                      state: controllers['state']?.text,
-                      municipality: controllers['municipality']?.text,
-                      nationality: controllers['nationality']?.text,
-                      postalCode: controllers['postal_code']?.text,
-                      birthplace: controllers['birthplace']?.text,
-                      birthdate: controllers['birthdate']?.text,
-                      maritalStatus: controllers['marital_status']?.text,
-                      gender: controllers['gender']?.text,
-                      maritalRegime: controllers['marital_regime']?.text,
-                      occupation: controllers['occupation']?.text,
-                      spouseName: controllers['spouse_name']?.text,
-                      spouseNationality: controllers['spouse_nationality']?.text,
-                      spouseEmail: controllers['spouse_email']?.text,
-                      pepPosition: controllers['pep_position']?.text,
-                      pepPeriod: controllers['pep_period']?.text,
-                      relatedPepName: controllers['related_pep_name']?.text,
-                      relatedPepPosition: controllers['related_pep_position']?.text,
-                      creditDestination: controllers['credit_destination']?.text,
-                      resourceOrigin: controllers['resource_origin']?.text,
-                      paymentFrequency: controllers['payment_frequency']?.text,
-                      paymentCount: int.tryParse(controllers['payment_count']?.text ?? ''),
-                      paymentType: controllers['payment_type']?.text,
-                      paymentAmount: double.tryParse(controllers['payment_amount']?.text ?? ''),
-                      status: controllers['status']?.text ?? 'pendiente',
-                      monthlyIncome: double.tryParse(controllers['monthly_income']?.text ?? ''),
-                      otherIncome: double.tryParse(controllers['other_income']?.text ?? ''),
-                      aval: Aval(
-                        name: controllers['aval_name']?.text ?? '',
-                        phone: controllers['aval_phone']?.text,
-                        email: controllers['aval_email']?.text,
-                        rfc: controllers['aval_rfc']?.text,
-                        curp: controllers['aval_curp']?.text,
-                        street: controllers['aval_street']?.text,
-                        colony: controllers['aval_colony']?.text,
-                        state: controllers['aval_state']?.text,
-                        municipality: controllers['aval_municipality']?.text,
-                        nationality: controllers['aval_nationality']?.text,
-                        postalCode: controllers['aval_postal_code']?.text,
-                        birthplace: controllers['aval_birthplace']?.text,
-                        birthdate: controllers['aval_birthdate']?.text,
-                        gender: controllers['aval_gender']?.text,
-                        maritalStatus: controllers['aval_marital_status']?.text,
-                        maritalRegime: controllers['aval_marital_regime']?.text,
-                        occupation: controllers['aval_occupation']?.text,
-                        spouseName: controllers['aval_spouse_name']?.text,
-                        spouseNationality: controllers['aval_spouse_nationality']?.text,
-                        spouseEmail: controllers['aval_spouse_email']?.text,
-                      ),
-                    ),
-                  );
+                  final data =
+                      widget.client == null
+                          ? await HomeService().postClient(
+                            ClientResponse(
+                              name: controllers['name']?.text,
+                              phone: controllers['phone']?.text,
+                              email: controllers['email']?.text,
+                              rfc: controllers['rfc']?.text,
+                              curp: controllers['curp']?.text,
+                              street: controllers['street']?.text,
+                              colony: controllers['colony']?.text,
+                              state: controllers['state']?.text,
+                              municipality: controllers['municipality']?.text,
+                              nationality: controllers['nationality']?.text,
+                              postalCode: controllers['postal_code']?.text,
+                              birthplace: controllers['birthplace']?.text,
+                              birthdate: controllers['birthdate']?.text,
+                              maritalStatus:
+                                  controllers['marital_status']?.text,
+                              gender: controllers['gender']?.text,
+                              maritalRegime:
+                                  controllers['marital_regime']?.text,
+                              occupation: controllers['occupation']?.text,
+                              spouseName: controllers['spouse_name']?.text,
+                              spouseNationality:
+                                  controllers['spouse_nationality']?.text,
+                              spouseEmail: controllers['spouse_email']?.text,
+                              pepPosition: controllers['pep_position']?.text,
+                              pepPeriod: controllers['pep_period']?.text,
+                              relatedPepName:
+                                  controllers['related_pep_name']?.text,
+                              relatedPepPosition:
+                                  controllers['related_pep_position']?.text,
+                              creditDestination:
+                                  controllers['credit_destination']?.text,
+                              resourceOrigin:
+                                  controllers['resource_origin']?.text,
+                              paymentFrequency:
+                                  controllers['payment_frequency']?.text,
+                              paymentCount: int.tryParse(
+                                controllers['payment_count']?.text ?? '',
+                              ),
+                              paymentType: controllers['payment_type']?.text,
+                              paymentAmount: double.tryParse(
+                                controllers['payment_amount']?.text ?? '',
+                              ),
+                              status:
+                                  controllers['status']?.text ?? 'pendiente',
+                              monthlyIncome: double.tryParse(
+                                controllers['monthly_income']?.text ?? '',
+                              ),
+                              otherIncome: double.tryParse(
+                                controllers['other_income']?.text ?? '',
+                              ),
+                              aval: Aval(
+                                name: controllers['aval_name']?.text ?? '',
+                                phone: controllers['aval_phone']?.text,
+                                email: controllers['aval_email']?.text,
+                                rfc: controllers['aval_rfc']?.text,
+                                curp: controllers['aval_curp']?.text,
+                                street: controllers['aval_street']?.text,
+                                colony: controllers['aval_colony']?.text,
+                                state: controllers['aval_state']?.text,
+                                municipality:
+                                    controllers['aval_municipality']?.text,
+                                nationality:
+                                    controllers['aval_nationality']?.text,
+                                postalCode:
+                                    controllers['aval_postal_code']?.text,
+                                birthplace:
+                                    controllers['aval_birthplace']?.text,
+                                birthdate: controllers['aval_birthdate']?.text,
+                                gender: controllers['aval_gender']?.text,
+                                maritalStatus:
+                                    controllers['aval_marital_status']?.text,
+                                maritalRegime:
+                                    controllers['aval_marital_regime']?.text,
+                                occupation:
+                                    controllers['aval_occupation']?.text,
+                                spouseName:
+                                    controllers['aval_spouse_name']?.text,
+                                spouseNationality:
+                                    controllers['aval_spouse_nationality']
+                                        ?.text,
+                                spouseEmail:
+                                    controllers['aval_spouse_email']?.text,
+                              ),
+                            ),
+                          )
+                          : await HomeService().putClient(
+                            ClientResponse(
+                              name: controllers['name']?.text,
+                              phone: controllers['phone']?.text,
+                              email: controllers['email']?.text,
+                              rfc: controllers['rfc']?.text,
+                              curp: controllers['curp']?.text,
+                              street: controllers['street']?.text,
+                              colony: controllers['colony']?.text,
+                              state: controllers['state']?.text,
+                              municipality: controllers['municipality']?.text,
+                              nationality: controllers['nationality']?.text,
+                              postalCode: controllers['postal_code']?.text,
+                              birthplace: controllers['birthplace']?.text,
+                              birthdate: controllers['birthdate']?.text,
+                              maritalStatus:
+                                  controllers['marital_status']?.text,
+                              gender: controllers['gender']?.text,
+                              maritalRegime:
+                                  controllers['marital_regime']?.text,
+                              occupation: controllers['occupation']?.text,
+                              spouseName: controllers['spouse_name']?.text,
+                              spouseNationality:
+                                  controllers['spouse_nationality']?.text,
+                              spouseEmail: controllers['spouse_email']?.text,
+                              pepPosition: controllers['pep_position']?.text,
+                              pepPeriod: controllers['pep_period']?.text,
+                              relatedPepName:
+                                  controllers['related_pep_name']?.text,
+                              relatedPepPosition:
+                                  controllers['related_pep_position']?.text,
+                              creditDestination:
+                                  controllers['credit_destination']?.text,
+                              resourceOrigin:
+                                  controllers['resource_origin']?.text,
+                              paymentFrequency:
+                                  controllers['payment_frequency']?.text,
+                              paymentCount: int.tryParse(
+                                controllers['payment_count']?.text ?? '',
+                              ),
+                              paymentType: controllers['payment_type']?.text,
+                              paymentAmount: double.tryParse(
+                                controllers['payment_amount']?.text ?? '',
+                              ),
+                              status:
+                                  controllers['status']?.text ?? 'pendiente',
+                              monthlyIncome: double.tryParse(
+                                controllers['monthly_income']?.text ?? '',
+                              ),
+                              otherIncome: double.tryParse(
+                                controllers['other_income']?.text ?? '',
+                              ),
+                              aval: Aval(
+                                name: controllers['aval_name']?.text ?? '',
+                                phone: controllers['aval_phone']?.text,
+                                email: controllers['aval_email']?.text,
+                                rfc: controllers['aval_rfc']?.text,
+                                curp: controllers['aval_curp']?.text,
+                                street: controllers['aval_street']?.text,
+                                colony: controllers['aval_colony']?.text,
+                                state: controllers['aval_state']?.text,
+                                municipality:
+                                    controllers['aval_municipality']?.text,
+                                nationality:
+                                    controllers['aval_nationality']?.text,
+                                postalCode:
+                                    controllers['aval_postal_code']?.text,
+                                birthplace:
+                                    controllers['aval_birthplace']?.text,
+                                birthdate: controllers['aval_birthdate']?.text,
+                                gender: controllers['aval_gender']?.text,
+                                maritalStatus:
+                                    controllers['aval_marital_status']?.text,
+                                maritalRegime:
+                                    controllers['aval_marital_regime']?.text,
+                                occupation:
+                                    controllers['aval_occupation']?.text,
+                                spouseName:
+                                    controllers['aval_spouse_name']?.text,
+                                spouseNationality:
+                                    controllers['aval_spouse_nationality']
+                                        ?.text,
+                                spouseEmail:
+                                    controllers['aval_spouse_email']?.text,
+                              ),
+                            ),
+                          );
 
                   setState(() {
                     isLoading = false;
